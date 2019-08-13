@@ -5,17 +5,25 @@ public class rsa{
 	public static void main(String[] args){
 		Scanner input = new Scanner(System.in);
 		Random rand = new Random();
-		long p = (long)(rand.nextDouble() * 10) + 1;
-		long q = (long)(rand.nextDouble() * 10) + 1;
-		while((prime(p) == false) && (prime(q) == false)){
-			p = (long)(rand.nextDouble() * 10) + 1;
-			q = (long)(rand.nextDouble() * 10) + 1;
+
+		long p = (long)(rand.nextDouble() * (127-2) + 2);
+		while(isPrime(p)==false){
+			p = (long)(rand.nextDouble() * (127-2) + 2);
 		}
-		System.out.println(p);
-		System.out.println(q);
-		long pk = p * q;
-		long phi = (p-1) * (q-1);
-		long e = (long)(rand.nextDouble()* phi) +1;
+		long q = (long)(rand.nextDouble() * (127-2) + 2);
+		while(isPrime(q)==false || ((isPrime(q)==true) && (q==p))){
+			q = (long)(rand.nextDouble() * (127-2) + 2);
+		}
+
+		long n = p * q;
+		// long phi = (p-1) * (q-1);
+		long phi = lcm((p-1), (q-1));
+
+		long e = (long)(rand.nextDouble()* phi) + 1;
+		while(gcd(e, phi) != 1){
+			e = (long)(rand.nextDouble()* phi) + 1;
+		}
+		System.out.println(e);
 		while(prime(e) == false){
 			e = (long)(rand.nextDouble()* phi) + 1;
 		}
@@ -42,26 +50,31 @@ public class rsa{
 		BigInteger decrypted = x.modPow(y, z);
 		//long original_num = (long)(Math.pow(encrypted, d) % pk);
 		System.out.println("Here is your decrypted number: " + decrypted);
-		//String public_key = Integer.toString(pk);
-		//String private_key = Integer.toString(d);
+		String public_key = Integer.toString(pk);
+		String private_key = Integer.toString(d);
 	}
 	
-	public static boolean prime(long n){
-		for(int i = 2;i < n;i++){
+	public static boolean isPrime(long n){
+		if(n==1 || n==0){
+			return false;
+		}
+		for(int i=2;i <= Math.sqrt(n);i++){
 			if(n%i==0){
 				return false;
 			}
 		}
 		return true;
 	}
-	
-	public static long lcm(long n){
-		for(int i = 2;i < n;i++){
-			if(n%i==0){
-				return false;
-			}
+
+	public static long gcd(long a, long b){
+		if(a == 0){
+			return b;
 		}
-		return true;
+		return gcd(b % a, a);
+	}
+	
+	public static long lcm(long a, long b){
+		return (a*b)/gcd(a,b);
 	}
 	
 }
